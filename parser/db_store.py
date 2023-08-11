@@ -1,19 +1,12 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[118]:
-
-
 import argparse
 import requests
 
 import psycopg2
 from psycopg2 import extras
 from psycopg2.errors import DuplicateTable, OperationalError, UniqueViolation
-
-
-# In[119]:
-
 
 def parse_arguments():
     """Parse command line arguments.
@@ -33,10 +26,6 @@ def parse_arguments():
     args = parser.parse_args()
     return args 
 
-
-# In[120]:
-
-
 def request_data(url):
     response = requests.get(url)
     
@@ -45,10 +34,6 @@ def request_data(url):
     else:
         print(f"Failed to fetch data. Status code: {response.status_code}")
         return None
-
-
-# In[121]:
-
 
 def create_table(
     tab_name: str,
@@ -103,10 +88,6 @@ def create_table(
     cur.close()
     conn.close()
 
-
-# In[122]:
-
-
 def setup_and_create_table(params, key, tab_schemas):
     try:
         tab_name, tab_schema = key, tab_schemas.get(key, -1)
@@ -116,10 +97,6 @@ def setup_and_create_table(params, key, tab_schemas):
         create_table(**params)
     except DuplicateTable as e:
         print(str(e))
-
-
-# In[123]:
-
 
 def populate_table(
     data: list,
@@ -165,10 +142,6 @@ def populate_table(
     cur.close()
     conn.close()
 
-
-# In[124]:
-
-
 tab_schemas = {
     'demand': 
         '''
@@ -202,10 +175,6 @@ tab_schemas = {
         '''
 }
 
-
-# In[125]:
-
-
 def construct_url(api, params):
     start_date = params.get('start_date', None)
     end_date = params.get('end_date', None)
@@ -235,19 +204,11 @@ def construct_url(api, params):
     return url
 
 
-# In[126]:
-
-
 # Python script
-# args = parse_arguments()
-# api_key = args.api_key
-# start_date = args.start
-# end_date = args.end
-
-# Notebook
-api_key = ''
-start_date = '2018-06-01'
-end_date = '2023-07-30'
+args = parse_arguments()
+api_key = args.api_key
+start_date = args.start
+end_date = args.end
 
 general_params = {
     'dbname': 'db_demand',
