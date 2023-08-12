@@ -155,24 +155,6 @@ tab_schemas = {
         value_units VARCHAR(100),
         UNIQUE (period, subba, subba_name, parent, parent_name, timezone, value, value_units)
         ''',
-
-    'weather_hist':
-        '''
-        time VARCHAR(100) UNIQUE,
-        weathercode INTEGER,
-        temperature_2m_max	REAL,
-        temperature_2m_min	REAL,
-        temperature_2m_mean REAL,
-        UNIQUE (time, weathercode, temperature_2m_max, temperature_2m_min, temperature_2m_mean)
-        ''',
-
-    'weather_latest':
-        '''
-        time VARCHAR(100) UNIQUE, 
-        temperature_2m_max REAL, 
-        temperature_2m_min REAL, 
-        UNIQUE (time,  temperature_2m_max, temperature_2m_min)
-        '''
 }
 
 def construct_url(api, params):
@@ -188,21 +170,7 @@ def construct_url(api, params):
         f'&facets[subba][]=ZONJ&start={start_date}&end={end_date}' + \
         f'&sort[0][column]=period&sort[0][direction]=asc&offset={offset}' + \
         f'&length={chunk_len}&api_key={api_key}'
-
-    elif api == 'weather_hist':
-        url = f'https://archive-api.open-meteo.com/v1' + \
-        f'/archive?latitude=52.52&longitude=13.41&start_date={start_date}' + \
-        f'&end_date={end_date}&daily=weathercode,temperature_2m_max,' + \
-        f'temperature_2m_min,temperature_2m_mean' + \
-        f'&timezone=America%2FNew_York'
-
-    elif api == 'weather_latest':
-        url = f'https://api.open-meteo.com/v1/forecast?' + \
-        f'latitude=52.52&longitude=13.41&hourly=temperature_2m&daily=' + \
-        f'temperature_2m_max,temperature_2m_min&timezone=America%2F' + \
-        f'New_York&past_days=7'
     return url
-
 
 # Python script
 args = parse_arguments()
@@ -249,7 +217,7 @@ request_params = {
     'chunk_len': 5000,
     'offset': 0
 }
-apis = ['demand', 'weather_hist', 'weather_latest']
+apis = ['demand']
 
 duplicates_msg = 'Error: Data already exists during storage attempt.'
 
@@ -280,49 +248,10 @@ def main():
 
                     try:
                         populate_table(**populate_params)
-                        # print(f"Successfuly stored {len(data_tuples)} rows.")
 
                     except UniqueViolation as e:
                         print(duplicates_msg)
                     params['offset'] += chunk_len
-
-            if api == 'weather_hist':
-                data_dict = data['daily']
-                data_tuples = [values for values in zip(*data_dict.values())]
-                schema = ", ".join(data_dict.keys())
-
-                setup_and_create_table(create_params, api, tab_schemas)
-
-                populate_params['data'] = data_tuples
-                populate_params['tab_name'] = api
-                populate_params['schema'] = schema
-                try:
-                    populate_table(**populate_params)
-                    # print(f"Successfuly stored {len(data_tuples)} rows.")
-
-                except UniqueViolation as e:
-                    print(duplicates_msg)
-
-            if api == 'weather_latest':
-                data_dict = data['daily']
-                data_tuples = [values for values in zip(*data_dict.values())]
-                schema = ", ".join(data_dict.keys())
-                setup_and_create_table(create_params, api, tab_schemas)
-
-                populate_params['data'] = data_tuples
-                populate_params['tab_name'] = api
-                populate_params['schema'] = schema
-
-                try:
-                    populate_table(**populate_params)
-                    # print(f"Successfuly stored {len(data_tuples)} rows.")
-
-                except UniqueViolation as e:
-                    print(duplicates_msg)
-
-
-# In[127]:
-
 
 if __name__ == "__main__":
     main()
