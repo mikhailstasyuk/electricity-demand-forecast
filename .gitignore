@@ -3,4 +3,3 @@ testdata/
 artifacts/
 mlflow.db
 mlruns/
-src/notebooks/
