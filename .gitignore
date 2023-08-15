@@ -3,4 +3,4 @@ testdata/
 artifacts/
 mlflow.db
 mlruns/
-parser/notebooks/
+src/notebooks/
