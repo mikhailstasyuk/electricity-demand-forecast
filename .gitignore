@@ -3,3 +3,4 @@ testdata/
 artifacts/
 mlflow.db
 mlruns/
+__pycache__/
