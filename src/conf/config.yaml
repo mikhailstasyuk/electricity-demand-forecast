@@ -1,7 +1,10 @@
 mlflow:
+  tracking_uri: sqlite:///mlflow.db
   experiment_name: hydratest
 
 hyperparameters:
+  N_TRIALS: 1
+
   sample_space:
     n_estimators:
       - 2
@@ -31,7 +34,6 @@ hyperparameters:
       - 1e-5
       - 10.0
     EARLY_STOPPING_ROUNDS: 50
-  N_TRIALS: 10
 
 training:
-  N_SPLITS: 5
+  N_SPLITS: 9
