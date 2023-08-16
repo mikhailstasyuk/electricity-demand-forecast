@@ -33,8 +33,8 @@ def train(config,
     """
 
     if track == True:
-        TRACKING_URI = 'sqlite:///mlflow.db'
-        mlflow.set_tracking_uri(TRACKING_URI)
+        print('TRACKING URIIIIIIIIIIIIIIIIIIIIIIII', config.mlflow.tracking_uri)
+        mlflow.set_tracking_uri(config.mlflow.tracking_uri)
         mlflow.set_experiment(config.mlflow.experiment_name)
 
     # Lists to store mean absolute errors for training and test sets
