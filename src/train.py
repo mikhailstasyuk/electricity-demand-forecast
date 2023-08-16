@@ -1,20 +1,18 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[6]:
-
-
-import pandas as pd
+import hydra
 import mlflow
+from prefect import task
+import pandas as pd
 
 from xgboost import XGBRegressor
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.model_selection import TimeSeriesSplit
 from sklearn.metrics import mean_absolute_error
 
-
-
-def train(
+@task(name='train func', retries=3, retry_delay_seconds=3)
+def train(config,
     model: XGBRegressor, 
     X: pd.DataFrame, 
     y: pd.Series,
@@ -37,7 +35,7 @@ def train(
     if track == True:
         TRACKING_URI = 'sqlite:///mlflow.db'
         mlflow.set_tracking_uri(TRACKING_URI)
-        mlflow.set_experiment('xgboost-train')
+        mlflow.set_experiment(config.mlflow.experiment_name)
 
     # Lists to store mean absolute errors for training and test sets
     mae_train_hist = []

@@ -1,25 +1,69 @@
 #!/usr/bin/env python
 # coding: utf-8
 import optuna
+import hydra
 from xgboost import XGBRegressor
 
-def tune_hyperparameters(train_func, X, y, n_trials=100, n_splits=5):
+def tune_hyperparameters(config, train_func, X, y, n_trials=100, n_splits=5):
     def objective(trial):
         params = {
-            'n_estimators': trial.suggest_int('n_estimators', 2, 1000),
-            'max_depth': trial.suggest_int('max_depth', 1, 15),
-            'learning_rate': trial.suggest_float('learning_rate', 0.001, 0.3),
-            'subsample': trial.suggest_float('subsample', 0.5, 1.0),
-            'colsample_bytree': trial.suggest_float('colsample_bytree', 0.5, 1.0),
-            'min_child_weight': trial.suggest_int('min_child_weight', 1, 10),
-            'alpha': trial.suggest_float("alpha", 1e-5, 10, log=True),  
-            'gamma': trial.suggest_float("gamma", 1e-5, 5, log=True),
-            'lambda': trial.suggest_float('lambda', 1e-5, 10.0, log=True),
-            'early_stopping_rounds': 50
-        }
+            'n_estimators': trial.suggest_int(
+                'n_estimators', 
+                *config.hyperparameters.sample_space.n_estimators,
+            ),
+
+            'max_depth': trial.suggest_int(
+                'max_depth', 
+                *config.hyperparameters.sample_space.max_depth
+            ),
+
+            'learning_rate': trial.suggest_float(
+                'learning_rate', 
+                *config.hyperparameters.sample_space.learning_rate
+            ),
+
+            'subsample': trial.suggest_float(
+                'subsample', *config.hyperparameters.sample_space.subsample
+            ),
+
+            'colsample_bytree': trial.suggest_float(
+                'colsample_bytree', 
+                *config.hyperparameters.sample_space.colsample_bytree
+            ),
+
+            'min_child_weight': trial.suggest_int(
+                'min_child_weight', 
+                *config.hyperparameters.sample_space.min_child_weight
+            ),
+
+            'alpha': trial.suggest_float(
+                "alpha", 
+                *config.hyperparameters.sample_space.alpha, 
+                log=True
+            ),
+
+            'gamma': trial.suggest_float(
+                "gamma", 
+                *config.hyperparameters.sample_space.gamma, 
+                log=True
+            ),
+
+            'lambda': trial.suggest_float(
+                'lambda', 
+                *config.hyperparameters.sample_space.lambda_val, 
+                log=True
+            ),
+
+            'early_stopping_rounds': 
+                config.hyperparameters.sample_space.EARLY_STOPPING_ROUNDS
+    }
 
         model = XGBRegressor(**params)
-        mae_train_avg, mae_test_avg = train_func(model, X, y, n_splits)
+        mae_train_avg, mae_test_avg = train_func(
+            config=config, 
+            model=model, 
+            X=X, y=y, 
+            n_splits=config.training.N_SPLITS)
         return mae_test_avg
 
     study = optuna.create_study(direction='minimize')
