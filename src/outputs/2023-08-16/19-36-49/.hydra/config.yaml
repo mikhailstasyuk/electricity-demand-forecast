@@ -1,0 +1,36 @@
+mlflow:
+  tracking_uri: sqlite:///mlflow.db
+  experiment_name: hydratest
+hyperparameters:
+  N_TRIALS: 1
+  sample_space:
+    n_estimators:
+    - 2
+    - 1000
+    max_depth:
+    - 1
+    - 15
+    learning_rate:
+    - 0.001
+    - 0.3
+    subsample:
+    - 0.5
+    - 1.0
+    colsample_bytree:
+    - 0.5
+    - 1.0
+    min_child_weight:
+    - 1
+    - 10
+    alpha:
+    - 1.0e-05
+    - 10
+    gamma:
+    - 1.0e-05
+    - 5
+    lambda_val:
+    - 1.0e-05
+    - 10.0
+    EARLY_STOPPING_ROUNDS: 50
+training:
+  N_SPLITS: 9
