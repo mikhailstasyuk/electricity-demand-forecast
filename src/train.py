@@ -8,6 +8,9 @@ import mlflow
 from prefect import task
 import pandas as pd
 
+import matplotlib
+matplotlib.use('Agg')
+
 from xgboost import XGBRegressor
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.model_selection import TimeSeriesSplit
@@ -38,7 +41,8 @@ def train(config,
         TRACKING_URI = 'sqlite:///' + utils.get_original_cwd() + '/mlflow.db'
         mlflow.set_tracking_uri(TRACKING_URI)
         mlflow.set_experiment(config.mlflow.experiment_name)
-        mlflow.xgboost.autolog(log_datasets=False, log_model_signatures=False)
+        mlflow.xgboost.autolog(log_datasets=False, 
+                               log_model_signatures=False)
 
     # Lists to store mean absolute errors for training and test sets
     mae_train_hist = []
