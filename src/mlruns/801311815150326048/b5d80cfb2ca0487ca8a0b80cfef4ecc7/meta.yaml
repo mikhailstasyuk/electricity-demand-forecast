@@ -1,0 +1,15 @@
+artifact_uri: file:///home/rhuu/mygit/electricity-demand-forecast/src/mlruns/801311815150326048/b5d80cfb2ca0487ca8a0b80cfef4ecc7/artifacts
+end_time: 1692268780613
+entry_point_name: ''
+experiment_id: '801311815150326048'
+lifecycle_stage: active
+run_id: b5d80cfb2ca0487ca8a0b80cfef4ecc7
+run_name: placid-bee-808
+run_uuid: b5d80cfb2ca0487ca8a0b80cfef4ecc7
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1692268753585
+status: 3
+tags: []
+user_id: rhuu

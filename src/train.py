@@ -2,6 +2,8 @@
 # coding: utf-8
 
 import hydra
+from hydra import utils
+
 import mlflow
 from prefect import task
 import pandas as pd
@@ -33,8 +35,10 @@ def train(config,
     """
 
     if track == True:
-        print('TRACKING URIIIIIIIIIIIIIIIIIIIIIIII', config.mlflow.tracking_uri)
-        mlflow.set_tracking_uri(config.mlflow.tracking_uri)
+        print('ORIG CWD', utils.get_original_cwd())
+        TRACKING_URI = 'file://' + utils.get_original_cwd() + '/mlruns'
+        print('TRACKING URIIIIIIIIIIIIIIIIIIIIIIII', TRACKING_URI)
+        mlflow.set_tracking_uri(TRACKING_URI)
         mlflow.set_experiment(config.mlflow.experiment_name)
 
     # Lists to store mean absolute errors for training and test sets
