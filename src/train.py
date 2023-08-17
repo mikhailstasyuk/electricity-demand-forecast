@@ -38,7 +38,7 @@ def train(config,
         TRACKING_URI = 'sqlite:///' + utils.get_original_cwd() + '/mlflow.db'
         mlflow.set_tracking_uri(TRACKING_URI)
         mlflow.set_experiment(config.mlflow.experiment_name)
-        mlflow.xgboost.autolog()
+        mlflow.xgboost.autolog(log_datasets=False, log_model_signatures=False)
 
     # Lists to store mean absolute errors for training and test sets
     mae_train_hist = []
