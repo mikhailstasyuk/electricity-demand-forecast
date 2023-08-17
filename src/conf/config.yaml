@@ -1,5 +1,6 @@
 mlflow:
   experiment_name: hydratest
+  model_name: xgb-regressor
 
 data:
   conn_params:
@@ -42,7 +43,7 @@ hyperparameters:
     lambda_val: 
       - 1e-5
       - 10.0
-    EARLY_STOPPING_ROUNDS: 50
+    EARLY_STOPPING_ROUNDS: 100
 
 training:
   N_SPLITS: 9
