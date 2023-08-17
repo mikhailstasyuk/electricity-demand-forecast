@@ -1,8 +1,18 @@
 mlflow:
   experiment_name: hydratest
 
+data:
+  conn_params:
+    tabname: demand
+    user: dbuser
+    password: 123
+    host: localhost
+    port: 5432
+    connect_timeout: 5
+
 hyperparameters:
-  N_TRIALS: 10
+  SEED: 1
+  N_TRIALS: 100
 
   sample_space:
     n_estimators:
