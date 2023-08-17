@@ -35,11 +35,10 @@ def train(config,
     """
 
     if track == True:
-        print('ORIG CWD', utils.get_original_cwd())
-        TRACKING_URI = 'file://' + utils.get_original_cwd() + '/mlruns'
-        print('TRACKING URIIIIIIIIIIIIIIIIIIIIIIII', TRACKING_URI)
+        TRACKING_URI = 'sqlite:///' + utils.get_original_cwd() + '/mlflow.db'
         mlflow.set_tracking_uri(TRACKING_URI)
         mlflow.set_experiment(config.mlflow.experiment_name)
+        mlflow.xgboost.autolog()
 
     # Lists to store mean absolute errors for training and test sets
     mae_train_hist = []
@@ -69,9 +68,11 @@ def train(config,
         # Append the errors to their respective histories
         mae_train_hist.append(mae_train)
         mae_test_hist.append(mae_test)
-        if track == True:
-            mlflow.log_metric('mae_train', mae_train)
-            mlflow.log_metric('mae_test', mae_test)
+        # if track == True:
+        #     mlflow.log_metric('mae_train', mae_train)
+        #     mlflow.log_metric('mae_test', mae_test)
+        #     mlflow.xgboost.log_model(model, 'xgb_best')
+        #     mlflow.log_artifacts(utils.to_absolute_path("conf"))
 
     # Calculate average mean absolute error for training and test sets
     mae_train_avg = sum(mae_train_hist) / len(mae_train_hist)
