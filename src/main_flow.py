@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
+import os
 import pickle
 import hydra
 from hydra import utils
@@ -22,8 +23,7 @@ def train_flow(config):
     most_recent_vals = df.iloc[-1][['rolling_mean', 'rolling_std']]
     
     artifacts = [ohe, schema, most_recent_vals]
-    artifacts_path = utils.to_absolute_path("artifacts") + '/afts.bin'
-    print('Saving artifacts to', artifacts_path)
+    artifacts_path = os.getcwd() + '/afts.bin'
     with open(artifacts_path, 'wb') as f_out:
         pickle.dump(artifacts, f_out)
 
