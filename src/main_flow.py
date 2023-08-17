@@ -20,6 +20,9 @@ def train_flow(config):
     schema = X.columns.tolist()
     most_recent_vals = df.iloc[-1][['rolling_mean', 'rolling_std']]
     
+    artifacts = [ohe, schema, most_recent_vals]
+
+
     best_params = hp_optimization.tune_hyperparameters(
         config=config,
         train_func=train.train,
@@ -28,17 +31,20 @@ def train_flow(config):
         n_splits=config.training.N_SPLITS,
 
     )
-    model = XGBRegressor(**best_params)
+    model = XGBRegressor(
+        **best_params,
+        early_stopping_rounds=
+        config.hyperparameters.sample_space.EARLY_STOPPING_ROUNDS,
+        random_state=config.hyperparameters.SEED
+    )
+    
     train.train(config=config,
                 model=model, 
                 X=X, y=y, 
                 n_splits=config.training.N_SPLITS, 
-                track=True)
+                track=True,
+                artifacts=artifacts)
     print(model)
-    
-    # features_to_drop = []
-    # artifacts = [ohe, features_to_drop, schema, most_recent_vals]
-    # return (model, artifacts)
 
 if __name__ == "__main__":
     train_flow()
