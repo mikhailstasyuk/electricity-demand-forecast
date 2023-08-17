@@ -23,7 +23,6 @@ def train(config,
     y: pd.Series,
     n_splits: int,
     track=False,
-    artifacts=None
 ) -> tuple:
     """
     Train a model using TimeSeriesSplit cross-validation.
@@ -72,12 +71,12 @@ def train(config,
         mae_train_hist.append(mae_train)
         mae_test_hist.append(mae_test)
         if track == True:
+            mlflow.log_params(model.get_params())
             mlflow.log_metric('mae_train', mae_train)
             mlflow.log_metric('mae_test', mae_test)
             mlflow.xgboost.log_model(model, 'xgb_best')
             mlflow.log_artifacts(utils.to_absolute_path("conf"))
-            for aft in artifacts:
-                mlflow.log_artifacts(aft)
+            mlflow.log_artifacts(utils.to_absolute_path("artifacts"))
 
     # Calculate average mean absolute error for training and test sets
     mae_train_avg = sum(mae_train_hist) / len(mae_train_hist)

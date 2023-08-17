@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 # coding: utf-8
-
+import pickle
 import hydra
+from hydra import utils
 import os
 import json
 from xgboost import XGBRegressor
@@ -21,7 +22,10 @@ def train_flow(config):
     most_recent_vals = df.iloc[-1][['rolling_mean', 'rolling_std']]
     
     artifacts = [ohe, schema, most_recent_vals]
-
+    artifacts_path = utils.to_absolute_path("artifacts") + '/afts.bin'
+    print('Saving artifacts to', artifacts_path)
+    with open(artifacts_path, 'wb') as f_out:
+        pickle.dump(artifacts, f_out)
 
     best_params = hp_optimization.tune_hyperparameters(
         config=config,
@@ -42,9 +46,7 @@ def train_flow(config):
                 model=model, 
                 X=X, y=y, 
                 n_splits=config.training.N_SPLITS, 
-                track=True,
-                artifacts=artifacts)
-    print(model)
+                track=True)
 
 if __name__ == "__main__":
     train_flow()
