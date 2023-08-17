@@ -4,10 +4,9 @@ import os
 import pickle
 import hydra
 from hydra import utils
-import os
 import json
 from xgboost import XGBRegressor
-import data_preprocessing, train, hp_optimization
+import data_preprocessing, train, hp_optimization, register_model
 from prefect import flow
 
 @hydra.main(config_path='conf/', config_name='config.yaml')
@@ -49,6 +48,8 @@ def train_flow(config):
                 X=X, y=y, 
                 n_splits=config.training.N_SPLITS, 
                 track=True)
+
+    register_model.choose_and_register(config)
 
 if __name__ == "__main__":
     train_flow()

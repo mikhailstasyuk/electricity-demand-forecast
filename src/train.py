@@ -48,7 +48,7 @@ def train(config,
     
     tscv = TimeSeriesSplit(n_splits=n_splits)
     if track == True:
-        mlflow.start_run()
+        run = mlflow.start_run()
         
     # Split the data using TimeSeriesSplit for cross-validation
     for train_index, test_index in tscv.split(X):
@@ -77,6 +77,10 @@ def train(config,
             mlflow.xgboost.log_model(model, 'xgb_best')
             mlflow.log_artifacts(utils.to_absolute_path("conf"))
             mlflow.log_artifacts(os.getcwd() + '/artifacts')
+
+            # Add the experiment id to the config for later reference 
+            experiment_id = run.info.experiment_id
+            
 
     # Calculate average mean absolute error for training and test sets
     mae_train_avg = sum(mae_train_hist) / len(mae_train_hist)
