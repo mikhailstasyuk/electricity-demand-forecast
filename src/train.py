@@ -22,7 +22,8 @@ def train(config,
     X: pd.DataFrame, 
     y: pd.Series,
     n_splits: int,
-    track=False
+    track=False,
+    artifacts=None
 ) -> tuple:
     """
     Train a model using TimeSeriesSplit cross-validation.
@@ -41,8 +42,6 @@ def train(config,
         TRACKING_URI = 'sqlite:///' + utils.get_original_cwd() + '/mlflow.db'
         mlflow.set_tracking_uri(TRACKING_URI)
         mlflow.set_experiment(config.mlflow.experiment_name)
-        mlflow.xgboost.autolog(log_datasets=False, 
-                               log_model_signatures=False)
 
     # Lists to store mean absolute errors for training and test sets
     mae_train_hist = []
@@ -72,11 +71,13 @@ def train(config,
         # Append the errors to their respective histories
         mae_train_hist.append(mae_train)
         mae_test_hist.append(mae_test)
-        # if track == True:
-        #     mlflow.log_metric('mae_train', mae_train)
-        #     mlflow.log_metric('mae_test', mae_test)
-        #     mlflow.xgboost.log_model(model, 'xgb_best')
-        #     mlflow.log_artifacts(utils.to_absolute_path("conf"))
+        if track == True:
+            mlflow.log_metric('mae_train', mae_train)
+            mlflow.log_metric('mae_test', mae_test)
+            mlflow.xgboost.log_model(model, 'xgb_best')
+            mlflow.log_artifacts(utils.to_absolute_path("conf"))
+            for aft in artifacts:
+                mlflow.log_artifacts(aft)
 
     # Calculate average mean absolute error for training and test sets
     mae_train_avg = sum(mae_train_hist) / len(mae_train_hist)
