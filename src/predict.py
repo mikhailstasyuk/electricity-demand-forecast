@@ -46,7 +46,7 @@ def predict(config):
     input_schema = ['period', 'timezone', 'value']
     data_inference = read_from_db(**config.data.conn_params, schema=input_schema)
     df_inference = data_inference.tail(1)
-    
+    print(df_inference)
     X_recent = prepare_for_inference(df_inference, artifacts)
 
     y_pred = model.predict(X_recent)
