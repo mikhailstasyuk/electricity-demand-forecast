@@ -27,7 +27,7 @@ def search_best(config):
 def check_if_registered(model_name, run_id):
     client = MlflowClient()
     for mv in client.search_model_versions(f"name='{model_name}'"):
-        pprint(dict(mv), indent=4)
+        # pprint(dict(mv), indent=4)
         if dict(mv)['run_id'] == run_id:
             return True
     return False
