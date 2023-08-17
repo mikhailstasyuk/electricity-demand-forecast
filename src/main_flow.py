@@ -23,8 +23,10 @@ def train_flow(config):
     most_recent_vals = df.iloc[-1][['rolling_mean', 'rolling_std']]
     
     artifacts = [ohe, schema, most_recent_vals]
-    artifacts_path = os.getcwd() + '/afts.bin'
-    with open(artifacts_path, 'wb') as f_out:
+
+    artifacts_path = os.getcwd() + '/artifacts'
+    os.mkdir(artifacts_path)
+    with open(artifacts_path + '/afts.bin', 'wb') as f_out:
         pickle.dump(artifacts, f_out)
 
     best_params = hp_optimization.tune_hyperparameters(

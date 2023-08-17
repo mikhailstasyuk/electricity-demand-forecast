@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
-
+import os
 import hydra
 from hydra import utils
 
@@ -76,7 +76,7 @@ def train(config,
             mlflow.log_metric('mae_test', mae_test)
             mlflow.xgboost.log_model(model, 'xgb_best')
             mlflow.log_artifacts(utils.to_absolute_path("conf"))
-            mlflow.log_artifacts(utils.to_absolute_path("artifacts"))
+            mlflow.log_artifacts(os.getcwd() + '/artifacts')
 
     # Calculate average mean absolute error for training and test sets
     mae_train_avg = sum(mae_train_hist) / len(mae_train_hist)
