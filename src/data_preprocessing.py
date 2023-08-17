@@ -78,19 +78,19 @@ def extract_features(
     df['value'] = df['value'].astype('int64')
 
     # Separate date features
-    df['year'] = df['period'].dt.year.astype('uint16')
-    df['month'] = df['period'].dt.month.astype('uint16')
-    df['day'] = df['period'].dt.day.astype('uint16')
+    df['year'] = df['period'].dt.year.astype('int16')
+    df['month'] = df['period'].dt.month.astype('int16')
+    df['day'] = df['period'].dt.day.astype('int16')
 
     # Extract the day of the week
     df['day_of_week'] = df['period'].dt.day_name().astype('category')
 
     # Extract quarterly and weekly information to capture seasonality
-    df['quarter'] = df['period'].dt.quarter.astype('uint8')
-    df['week_of_year'] = df['period'].dt.isocalendar().week.astype('uint16')
+    df['quarter'] = df['period'].dt.quarter.astype('int8')
+    df['week_of_year'] = df['period'].dt.isocalendar().week.astype('int16')
 
     # Mark the weekends
-    df['is_weekend'] = (df['period'].dt.weekday >= 5).astype('uint8')
+    df['is_weekend'] = (df['period'].dt.weekday >= 5).astype('int8')
     
     if not inference:
         # Create rolling mean feature
@@ -123,7 +123,7 @@ def transform_to_supervised(df: pd.DataFrame) -> pd.DataFrame:
     df.dropna(inplace=True)
 
     # Convert 'lag' column to unsigned 64-bit integer type
-    df.lag = df.lag.astype('uint64')
+    df.lag = df.lag.astype('int64')
 
     # Drop the 'period' column from the DataFrame
     df = df.drop(columns=['period'])
