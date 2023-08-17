@@ -5,6 +5,7 @@ mlflow:
 data:
   conn_params:
     tabname: demand
+    dbname: db_demand
     user: dbuser
     password: 123
     host: localhost
