@@ -66,7 +66,8 @@ def tune_hyperparameters(config, train_func, X, y, n_trials=100, n_splits=5):
             n_splits=config.training.N_SPLITS)
         return mae_test_avg
 
-    study = optuna.create_study(direction='minimize')
+    sampler = TPESampler(seed=1)
+    study = optuna.create_study(direction='minimize', sampler=sampler)
 
     # Optimize the study, the objective function is passed in as the first argument
     study.optimize(objective, n_trials=n_trials)
