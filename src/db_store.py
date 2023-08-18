@@ -120,7 +120,7 @@ def main(config):
     except:
         print("Exists")      
 
-    url = config.data.api.urls.DEMAND
+    url = eval('config.data.api.urls.' + tab_name.upper())
     url_query = db_store.parse_api_url(url)
     
     # Close the connection
