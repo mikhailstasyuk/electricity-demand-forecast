@@ -24,7 +24,8 @@ def train_flow(config):
     artifacts = [ohe, schema, most_recent_vals]
 
     artifacts_path = os.getcwd() + '/artifacts'
-    os.mkdir(artifacts_path)
+    if not os.path.exists(artifacts_path):
+        os.mkdir(artifacts_path)
     with open(artifacts_path + '/afts.bin', 'wb') as f_out:
         pickle.dump(artifacts, f_out)
 
