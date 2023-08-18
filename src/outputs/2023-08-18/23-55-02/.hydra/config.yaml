@@ -1,0 +1,73 @@
+mlflow:
+  experiment_name: hydratest
+  model_name: xgb-regressor
+data:
+  conn_params:
+    dbname: db_demand
+    user: dbuser
+    password: 123
+    host: localhost
+    port: 5432
+    connect_timeout: 5
+  tab_params:
+    tabname: demand
+    tab_schema:
+      demand: "CREATE TABLE demand (\n  id SERIAL PRIMARY KEY,\n  period VARCHAR(100),\n\
+        \  subba VARCHAR(100),\n  subba_name VARCHAR(100),\t\n  parent VARCHAR(100),\t\
+        \n  parent_name VARCHAR(100),\t\n  timezone VARCHAR(100),\t\n  value INTEGER,\t\
+        \n  value_units VARCHAR(100),\n  UNIQUE (period, subba, subba_name, parent,\
+        \ parent_name, timezone, value, value_units)\n);\n"
+  api:
+    query:
+      SUBBA: ZONJ
+      START_DATE: '2018-06-18'
+      END_DATE: today
+      OFFSET: 0
+      CHUNK_LEN: 5000
+      API_KEY: ASDJASDHAAJ
+    urls:
+      DEMAND: 'https://api.eia.gov/v2/electricity/rto/
+
+        daily-region-sub-ba-data/data/?frequency=daily&data[0]=value
+
+        &facets[subba][]=<SUBBA_CODE>&start=<START_DATE>&end=<END_DATE>
+
+        &sort[0][column]=period&sort[0][direction]=asc&offset=<OFFSET>
+
+        &length=<CHUNK_LEN>&api_key=<API_KEY>
+
+        '
+hyperparameters:
+  SEED: 1
+  N_TRIALS: 1
+  sample_space:
+    n_estimators:
+    - 2
+    - 1000
+    max_depth:
+    - 1
+    - 15
+    learning_rate:
+    - 0.001
+    - 0.3
+    subsample:
+    - 0.5
+    - 1.0
+    colsample_bytree:
+    - 0.5
+    - 1.0
+    min_child_weight:
+    - 1
+    - 10
+    alpha:
+    - 1.0e-05
+    - 10
+    gamma:
+    - 1.0e-05
+    - 5
+    lambda_val:
+    - 1.0e-05
+    - 10.0
+    EARLY_STOPPING_ROUNDS: 100
+training:
+  N_SPLITS: 9
