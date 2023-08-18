@@ -3,7 +3,7 @@
 import hydra
 import argparse
 import requests
-from datetime import datetime, timedelta
+from datetime import datetime
 
 import psycopg2
 from psycopg2 import extras
@@ -70,8 +70,8 @@ class DatabaseHandler(object):
             }
         url = url.replace("\n", "")
         if self.config.data.api.query.END_DATE == 'today':
-            yesterday = datetime.today() - timedelta(1)
-            url = url.replace("<END_DATE>", yesterday.strftime('%Y-%m-%d'))
+            today = datetime.today()
+            url = url.replace("<END_DATE>", today.strftime('%Y-%m-%d'))
         else:
             url = url.replace(
                 "<END_DATE>", str(self.config.data.api.query.END_DATE)
@@ -122,7 +122,7 @@ def main(config):
 
     url = eval('config.data.api.urls.' + tab_name.upper())
     url_query = db_store.parse_api_url(url)
-    
+    print(url_query)
     # Close the connection
     db_store.close()
 if __name__ == "__main__":
