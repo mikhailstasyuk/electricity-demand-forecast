@@ -40,6 +40,18 @@ def register_model(run, model_name):
         result = mlflow.register_model(
         model_uri, model_name
         )
+        print(model_name, result.version)
+        promote_to_production(model_name, result.version)
+        
+
+def promote_to_production(model_name, model_version):
+    client = MlflowClient()
+    client.transition_model_version_stage(
+        name=model_name, 
+        version=model_version,
+        stage="Production",
+        archive_existing_versions=True
+    )
 
 @hydra.main(config_path='conf/', config_name='config.yaml')
 def choose_and_register(config):
