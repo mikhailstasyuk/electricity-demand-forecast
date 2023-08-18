@@ -1,0 +1,50 @@
+mlflow:
+  experiment_name: hydratest
+  model_name: xgb-regressor
+
+data:
+  conn_params:
+    tabname: demand
+    dbname: db_demand
+    user: dbuser
+    password: 123
+    host: localhost
+    port: 5432
+    connect_timeout: 5
+
+hyperparameters:
+  SEED: 1
+  N_TRIALS: 50
+
+  sample_space:
+    n_estimators:
+      - 2
+      - 1000
+    max_depth: 
+      - 1
+      - 15
+    learning_rate:
+      - 0.001
+      - 0.3
+    subsample: 
+      - 0.5
+      - 1.0
+    colsample_bytree: 
+      - 0.5
+      - 1.0
+    min_child_weight: 
+      - 1
+      - 10
+    alpha: 
+      - 1e-5
+      - 10
+    gamma: 
+      - 1e-5
+      - 5
+    lambda_val: 
+      - 1e-5
+      - 10.0
+    EARLY_STOPPING_ROUNDS: 100
+
+training:
+  N_SPLITS: 9
