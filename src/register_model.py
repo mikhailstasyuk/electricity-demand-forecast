@@ -21,7 +21,6 @@ def search_best(config):
         max_results=1,
         order_by=["metrics.mae_test ASC"],
     )[0]
-    print(run.info.artifact_uri)
     return run
 
 def check_if_registered(model_name, run_id):
@@ -40,7 +39,6 @@ def register_model(run, model_name):
         result = mlflow.register_model(
         model_uri, model_name
         )
-        print(model_name, result.version)
         promote_to_production(model_name, result.version)
         
 
