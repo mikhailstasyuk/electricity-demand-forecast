@@ -78,10 +78,6 @@ def train(config,
             mlflow.log_artifacts(utils.to_absolute_path("conf"))
             mlflow.log_artifacts(os.getcwd() + '/artifacts')
 
-            # Add the experiment id to the config for later reference 
-            experiment_id = run.info.experiment_id
-            
-
     # Calculate average mean absolute error for training and test sets
     mae_train_avg = sum(mae_train_hist) / len(mae_train_hist)
     mae_test_avg = sum(mae_test_hist) / len(mae_test_hist)
