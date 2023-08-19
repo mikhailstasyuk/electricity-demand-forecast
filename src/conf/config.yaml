@@ -36,7 +36,6 @@ data:
       OFFSET: 0
       CHUNK_LEN: 5000
 
-
     urls:
       DEMAND: |
         https://api.eia.gov/v2/electricity/rto/
