@@ -44,7 +44,9 @@ def predict(config):
         artifacts = pickle.load(f_in)
     
     input_schema = ['period', 'timezone', 'value']
-    data_inference = read_from_db(**config.data.conn_params, schema=input_schema)
+    data_inference = read_from_db(**config.data.conn_params, 
+                                  tabname=config.data.tab_params.tabname,
+                                  schema=input_schema)
     df_inference = data_inference.tail(1)
     print(df_inference)
     X_recent = prepare_for_inference(df_inference, artifacts)
