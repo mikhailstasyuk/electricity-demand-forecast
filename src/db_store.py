@@ -18,10 +18,10 @@ class URLParser(object):
         self.end_date = config.data.api.query.END_DATE
         self.offset = config.data.api.query.OFFSET
         self.chunk_len = config.data.api.query.CHUNK_LEN
-        self.api_key = config.data.api.query.API_KEY
+        # self.api_key = config.data.api.query.API_KEY
 
     def get_api_key(self):
-        api_key = os.environ.get("API_KEY")
+        api_key = os.environ.get("MY_API_KEY")
         if api_key is None:
             raise Exception("API key not found in environment variables")
         return api_key
@@ -143,7 +143,7 @@ def main(config):
     # Connect to db
     db_store = DatabaseHandler(config)
     db_store.connect()
-    api_key = URLParser().get_api_key()
+    api_key = URLParser(config).get_api_key()
     print(api_key)
 
     # # Create a table
