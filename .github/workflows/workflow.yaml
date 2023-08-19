@@ -1,16 +1,10 @@
-name: API Key Setup
+name: Empty Workflow
 
-on: [push]
+on: [push] # Triggers the workflow on push events
 
 jobs:
-  setup_api_key:
+  placeholder_job:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Check out code
-        uses: actions/checkout@v2
-
-      - name: Print a Message
-        run: echo "API key is set up but not displayed here."
-        env:
-          MY_API_KEY: ${{ secrets.API_KEY }}
+      - name: Placeholder Step
+        run: echo "This is a placeholder step that does nothing."
