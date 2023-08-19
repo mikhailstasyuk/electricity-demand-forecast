@@ -18,10 +18,10 @@ class URLParser(object):
         self.end_date = config.data.api.query.END_DATE
         self.offset = config.data.api.query.OFFSET
         self.chunk_len = config.data.api.query.CHUNK_LEN
-        # self.api_key = config.data.api.query.API_KEY
+        self.api_key = self.get_api_key()
 
     def get_api_key(self):
-        api_key = os.environ.get("MY_API_KEY")
+        api_key = os.environ.get("API_KEY")
         if api_key is None:
             raise Exception("API key not found in environment variables")
         return api_key
@@ -143,48 +143,45 @@ def main(config):
     # Connect to db
     db_store = DatabaseHandler(config)
     db_store.connect()
-    api_key = URLParser(config).get_api_key()
-    print(api_key)
 
-    # # Create a table
-    # tab_name = config.data.tab_params.tabname
-    # tab_schema = eval(
-    #     f'config.data.tab_params.tab_schema.{tab_name}'
-    # )
+    # Create a table
+    tab_name = config.data.tab_params.tabname
+    tab_schema = eval(
+        f'config.data.tab_params.tab_schema.{tab_name}'
+    )
 
-    # db_store.create_table(tab_name, tab_schema)
+    db_store.create_table(tab_name, tab_schema)
 
-    # urlparser = URLParser(config)
-    # url = urlparser.construct_url(tab_name)
+    urlparser = URLParser(config)
+    url = urlparser.construct_url(tab_name)
 
-    # data = db_store.request_data(url)
+    data = db_store.request_data(url)
 
-    # if data:
-    #     if tab_name == 'demand':
-    #         total_rows = data['response']['total']
-    #         print("Total rows:", total_rows)
-    #         chunk_len = urlparser.chunk_len
-    #         total_chunks = int(total_rows / chunk_len) + 1
-    #         print("Total chunks to download:", total_chunks)            
+    if data:
+        if tab_name == 'demand':
+            total_rows = data['response']['total']
+            print("Total rows:", total_rows)
+            chunk_len = urlparser.chunk_len
+            total_chunks = int(total_rows / chunk_len) + 1
+            print("Total chunks to download:", total_chunks)            
 
-    #         for i in range(total_chunks):
-    #             url = urlparser.construct_url(tab_name)
-    #             print("Downloading from url...\n", url)
-    #             data = db_store.request_data(url)
-    #             data_list = data['response']['data']
-    #             data_tuples = [tuple(d.values()) for d in data_list]
-    #             schema = ", ".join(data_list[0].keys()).replace("-", "_")
+            for i in range(total_chunks):
+                url = urlparser.construct_url(tab_name)
+                data = db_store.request_data(url)
+                data_list = data['response']['data']
+                data_tuples = [tuple(d.values()) for d in data_list]
+                schema = ", ".join(data_list[0].keys()).replace("-", "_")
 
-    #             try:
-    #                 db_store.insert(
-    #                     data=data_tuples,
-    #                     schema=schema,
-    #                     tab_name=tab_name
-    #                 )
-    #             except Exception as e:
-    #                 print(str(e))
+                try:
+                    db_store.insert(
+                        data=data_tuples,
+                        schema=schema,
+                        tab_name=tab_name
+                    )
+                except Exception as e:
+                    print(str(e))
                 
-    #             urlparser.offset += chunk_len
+                urlparser.offset += chunk_len
 
     # Close the connection
     db_store.close()
