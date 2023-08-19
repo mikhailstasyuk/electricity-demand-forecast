@@ -35,7 +35,7 @@ data:
       END_DATE: today
       OFFSET: 0
       CHUNK_LEN: 5000
-      API_KEY: ***REMOVED***
+      API_KEY: 
 
     urls:
       DEMAND: |
