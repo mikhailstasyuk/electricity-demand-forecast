@@ -1,13 +1,12 @@
 #!/usr/bin/env python
 # coding: utf-8
 import hydra
-import argparse
 import requests
 from datetime import datetime
 
 import psycopg2
 from psycopg2 import extras
-from psycopg2.errors import DuplicateTable, OperationalError, UniqueViolation
+from psycopg2.errors import OperationalError
 
 class URLParser(object):
     def __init__(self, config):
@@ -143,7 +142,7 @@ def main(config):
     tab_schema = eval(
         f'config.data.tab_params.tab_schema.{tab_name}'
     )
-    
+
     db_store.create_table(tab_name, tab_schema)
 
     urlparser = URLParser(config)
