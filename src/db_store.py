@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
+import os
 import hydra
 import requests
 from datetime import datetime
@@ -19,6 +20,12 @@ class URLParser(object):
         self.chunk_len = config.data.api.query.CHUNK_LEN
         self.api_key = config.data.api.query.API_KEY
 
+    def get_api_key(self):
+        api_key = os.environ.get("API_KEY")
+        if api_key is None:
+            raise Exception("API key not found in environment variables")
+        return api_key
+    
     def construct_url(self, tab_name):
         replacements = {
             "<SUBBA_CODE>": str(self.subba),
