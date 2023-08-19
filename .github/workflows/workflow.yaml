@@ -11,6 +11,6 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Print a Message
-        run: eho "API key is set up but not displayed here."
+        run: echo "API key is set up but not displayed here."
         env:
           API_KEY: ${{ secrets.API_KEY }}
