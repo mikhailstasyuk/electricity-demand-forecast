@@ -6,7 +6,6 @@ name = "pypi"
 [packages]
 hydra-core = "*"
 xgboost = "*"
-sqlalchemy = "*"
 pandas = "*"
 scikit-learn = "*"
 prefect = "*"
