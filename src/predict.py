@@ -48,13 +48,14 @@ def predict(config):
     X_recent = prepare_for_inference(df_inference, artifacts)
 
     y_pred = model.predict(X_recent)
-    return y_pred
+    return y_pred[0]
 
 @hydra.main(config_path='conf/', config_name='config.yaml')
 @flow(name='prediction_flow')
 def main(config):
     pred = predict(config=config)
-    pd.Series(pred).to_json('pred.json')
+    pred = pd.Series(pred)
+    pred.to_json(utils.get_original_cwd() + '/pred.json')
     
 if __name__ == "__main__":
     main()
