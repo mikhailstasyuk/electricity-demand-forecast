@@ -12,7 +12,7 @@ from prefect import flow
 @hydra.main(config_path='conf/', config_name='config.yaml')
 @flow(name='train_flow', retries=3, retry_delay_seconds=5)
 def train_flow(config):
-    df, ohe = data_preprocessing.preprocess()
+    df, ohe = data_preprocessing.preprocess(config=config)
 
     # Separate features and target.
     X = df.drop(columns=['value'])
