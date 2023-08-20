@@ -46,7 +46,7 @@ data:
 
 hyperparameters:
   SEED: 1
-  N_TRIALS: 100
+  N_TRIALS: 10
 
   sample_space:
     n_estimators:
