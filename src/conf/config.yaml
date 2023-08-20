@@ -1,5 +1,5 @@
 mlflow:
-  experiment_name: hydratest
+  experiment_name: electricity-demand
   model_name: xgb-regressor
 
 data:
