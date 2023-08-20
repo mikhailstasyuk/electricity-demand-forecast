@@ -56,4 +56,4 @@ def predict(config):
 def handler(event, context):
     predict()
 if __name__ == "__main__":
-    handler()
+    handler(None, None)
