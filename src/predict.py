@@ -48,11 +48,9 @@ def predict(config):
                                   tabname=config.data.tab_params.tabname,
                                   schema=input_schema)
     df_inference = data_inference.tail(1)
-    print(df_inference)
     X_recent = prepare_for_inference(df_inference, artifacts)
 
     y_pred = model.predict(X_recent)
-    print('Holy Shit Preds:', y_pred)
     return y_pred
 
 if __name__ == "__main__":
