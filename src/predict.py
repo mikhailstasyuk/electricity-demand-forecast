@@ -50,7 +50,7 @@ def predict(config):
     y_pred = model.predict(X_recent)
     return y_pred
 
-@hydra.main(config_path='conf', config_name='config.yaml')
+@hydra.main(config_path='conf/', config_name='config.yaml')
 @flow(name='prediction_flow')
 def main(config):
     pred = predict(config=config)
