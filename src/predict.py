@@ -3,7 +3,7 @@
 import pandas as pd
 import mlflow
 import mlflow.pyfunc
-from data_preprocessing import read_from_db
+from db_store import DatabaseHandler
 from data_preprocessing import extract_features, encode_categorical
 import hydra
 from hydra import utils
@@ -44,10 +44,21 @@ def predict(config):
         artifacts = pickle.load(f_in)
 
     input_schema = ['period', 'timezone', 'value']
-    data_inference = read_from_db(**config.data.conn_params, 
-                                    tabname=config.data.tab_params.tabname,
-                                    schema=input_schema)
-    df_inference = data_inference.tail(1)
+    db_handler = DatabaseHandler(config)
+
+    db_handler.connect()
+
+    input_schema = ['period', 'timezone', 'value']
+    tab_name = config.data.tab_params.tabname
+    schema_str = ",".join(input_schema)
+
+    query = f'SELECT {schema_str} FROM {tab_name};'
+    
+    df = db_handler.query(query)
+    
+    db_handler.close()
+
+    df_inference = df.tail(1)
     X_recent = prepare_for_inference(df_inference, artifacts)
 
     y_pred = model.predict(X_recent)
