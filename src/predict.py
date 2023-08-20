@@ -29,9 +29,12 @@ def predict(config):
     stage = 'Production'
     model_uri=f'models:/{model_name}/{stage}'
 
-    model = mlflow.pyfunc.load_model(
-        model_uri=model_uri
-    )
+    try:
+        model = mlflow.pyfunc.load_model(
+            model_uri=model_uri
+        )
+    except Exception as e:
+        raise Exception(str(e))
 
     best_run_id = model.metadata.run_id
 
