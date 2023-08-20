@@ -1,0 +1,20 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+hydra-core = "*"
+xgboost = "*"
+sqlalchemy = "*"
+pandas = "*"
+scikit-learn = "*"
+prefect = "*"
+mlflow = "*"
+optuna = "*"
+psycopg2-binary = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.9"
