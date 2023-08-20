@@ -119,21 +119,32 @@ class DatabaseHandler(object):
         schema: list,
         tab_name: str,
     ) -> None:
+        if self.conn is not None:
+            cur = self.conn.cursor()
 
-        cur = self.conn.cursor()
+            # Insert data
+            extras.execute_values(
+                cur,
+                f"""INSERT INTO {tab_name} ({schema}) 
+                VALUES %s
+                ON CONFLICT ({schema})
+                DO NOTHING;""",
+                data
+            )
 
-        # Insert data
-        extras.execute_values(
-            cur,
-            f"""INSERT INTO {tab_name} ({schema}) 
-            VALUES %s
-            ON CONFLICT ({schema})
-            DO NOTHING;""",
-            data
-        )
+            self.conn.commit()
+            cur.close()
+        else:
+            print("Not connected to a db.")
 
-        self.conn.commit()
-        cur.close()
+    def query(self, query):
+        if self.conn is not None:
+            import pandas as pd
+            df = pd.read_sql(query, self.conn)
+            return df
+        else:
+            print("Not connected to a db.")
+
 
 @hydra.main(config_path='conf', config_name='config.yaml')
 def main(config):
