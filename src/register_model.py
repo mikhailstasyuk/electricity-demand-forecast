@@ -44,9 +44,7 @@ def register_model(run, model_name):
     run_id = run.info.run_id
     model_uri = 'runs:/' + run_id + '/xgb_best'
     is_registered = check_if_registered(model_name, run_id)
-    print(f"Model {model_uri} is registered: {is_registered}.")
     if not is_registered:
-        print("Adding model to registry...")
         result = mlflow.register_model(
         model_uri, model_name
         )
@@ -60,5 +58,6 @@ def choose_and_register(config):
     result = register_model(run, model_name)
     if result is not None:
         promote_to_production(model_name, result.version)
+
 if __name__ == "__main__":
     choose_and_register()
