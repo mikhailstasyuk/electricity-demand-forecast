@@ -1,3 +1,4 @@
 data/
 testdata/
 __pycache__/
+.env
