@@ -1,35 +1,37 @@
 #!/usr/bin/env python
 # coding: utf-8
-from sqlalchemy import create_engine, text
 import pandas as pd
 
 from sklearn.preprocessing import OneHotEncoder
 from prefect import task, flow
+import hydra
 
-@task(retries=3, retry_delay_seconds=5)
-def read_from_db(
-    tabname: str,
-    dbname: str,
-    schema: list,
-    user: str,
-    password: str,
-    host: int,
-    port: int,
-    connect_timeout: int
-) -> pd.DataFrame:
+from db_store import DatabaseHandler
+
+# @task(retries=3, retry_delay_seconds=5)
+# def read_from_db(
+#     tabname: str,
+#     dbname: str,
+#     schema: list,
+#     user: str,
+#     password: str,
+#     host: int,
+#     port: int,
+#     connect_timeout: int
+# ) -> pd.DataFrame:
     
-    DATABASE_URL = f"postgresql+psycopg2://{user}:{password}@{host}:{port}/{dbname}"
-    try:
-        engine = create_engine(DATABASE_URL, connect_args={'connect_timeout': connect_timeout})
-    except:
-        print("Failed to establish connection to the database.")
+#     DATABASE_URL = f"postgresql+psycopg2://{user}:{password}@{host}:{port}/{dbname}"
+#     try:
+#         engine = create_engine(DATABASE_URL, connect_args={'connect_timeout': connect_timeout})
+#     except:
+#         print("Failed to establish connection to the database.")
 
-    schema_str = ",".join(schema)
-    query = text(f'SELECT {schema_str} FROM {tabname};')
+#     schema_str = ",".join(schema)
+#     query = text(f'SELECT {schema_str} FROM {tabname};')
 
-    with engine.connect() as conn:
-        df = pd.read_sql_query(query, conn).reset_index(drop=True)
-    return df
+#     with engine.connect() as conn:
+#         df = pd.read_sql_query(query, conn).reset_index(drop=True)
+#     return df
 
 @task(retries=3, retry_delay_seconds=5)
 def filter_by_iqr(df: pd.DataFrame) -> pd.DataFrame:
@@ -159,23 +161,23 @@ def encode_categorical(df: pd.DataFrame, ohe=None, fit=True) -> pd.DataFrame:
     df = pd.concat((df.drop(columns=feat_to_enc.columns), dummies), axis=1)
     return df, ohe
 
-flow(name="data_preprocessing flow", retries=3, retry_delay_seconds=5)
-def preprocess():
-    schema = ['period', 'timezone', 'value']
-    tabname = 'demand'
-    conn_params = {
-    'tabname': tabname,
-    'dbname': 'db_demand',
-    'schema': schema,
-    'user': 'dbuser',
-    'password': '123',
-    'host': 'localhost',
-    'port': '5432',
-    'connect_timeout': 5
-    }
+# @hydra.main(config_path='conf/', config_name='config.yaml')
+@flow(name="data_preprocessing flow", retries=3, retry_delay_seconds=5)
+def preprocess(config):
+    db_handler = DatabaseHandler(config)
 
-    df = read_from_db(**conn_params)
+    db_handler.connect()
+
+    input_schema = ['period', 'timezone', 'value']
+    tab_name = config.data.tab_params.tabname
+    schema_str = ",".join(input_schema)
+
+    query = f'SELECT {schema_str} FROM {tab_name};'
     
+    df = db_handler.query(query)
+    
+    db_handler.close()
+
     # Clean it up, extract date features and running statistics.
     df_no_outliers = filter_by_iqr(df)
     df_newfeat= extract_features(df_no_outliers)
@@ -184,3 +186,6 @@ def preprocess():
     df_transformed = transform_to_supervised(df_newfeat)
     df_encoded, ohe = encode_categorical(df_transformed)
     return df_encoded, ohe
+
+if __name__ == "__main__":
+    preprocess()
