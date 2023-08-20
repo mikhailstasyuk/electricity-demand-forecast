@@ -5,12 +5,9 @@ import hydra
 import requests
 from datetime import datetime
 
-from dotenv import load_dotenv
-
 import psycopg2
 from psycopg2 import extras
 from psycopg2.errors import OperationalError
-
 
 class URLParser(object):
     def __init__(self, config):
@@ -140,7 +137,9 @@ class DatabaseHandler(object):
 
 @hydra.main(config_path='conf', config_name='config.yaml')
 def main(config):
-    load_dotenv()
+    if os.path.isfile('.env'):
+        from dotenv import load_dotenv
+        load_dotenv()
     # Connect to db
     db_store = DatabaseHandler(config)
     db_store.connect()
