@@ -5,27 +5,24 @@ import hydra
 import requests
 from datetime import datetime
 
+from dotenv import load_dotenv
+
 import psycopg2
 from psycopg2 import extras
 from psycopg2.errors import OperationalError
 
+
 class URLParser(object):
     def __init__(self, config):
         self.config = config
-
+        
         self.subba = config.data.api.query.SUBBA
         self.start_date = config.data.api.query.START_DATE
         self.end_date = config.data.api.query.END_DATE
         self.offset = config.data.api.query.OFFSET
         self.chunk_len = config.data.api.query.CHUNK_LEN
-        self.api_key = self.get_api_key()
+        self.api_key = os.getenv('API_KEY')
 
-    def get_api_key(self):
-        api_key = os.environ.get("API_KEY")
-        if api_key is None:
-            raise Exception("API key not found in environment variables")
-        return api_key
-    
     def construct_url(self, tab_name):
         replacements = {
             "<SUBBA_CODE>": str(self.subba),
@@ -140,6 +137,7 @@ class DatabaseHandler(object):
 
 @hydra.main(config_path='conf', config_name='config.yaml')
 def main(config):
+    load_dotenv()
     # Connect to db
     db_store = DatabaseHandler(config)
     db_store.connect()
