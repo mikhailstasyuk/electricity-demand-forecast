@@ -93,14 +93,17 @@ class DatabaseHandler(object):
     
     def create_table(self, tab_name, tab_schema):
         if self.conn is not None:
+            cur = self.conn.cursor()
             if self.table_exists(tab_name):
-                print(f"Table {tab_name} already exists. Using existing table.")
-
-            else:
-                cur = self.conn.cursor()
-                cur.execute(tab_schema)
+                print(f"Table {tab_name} already exists. Dropping it " \
+                      + "and creating a new one.")
+                
+                cur.execute(f"DROP TABLE {tab_name};")
                 self.conn.commit()
-                cur.close()
+
+            cur.execute(tab_schema)
+            self.conn.commit()
+            cur.close()
         else:
             print("Not connected to a db.")
     
