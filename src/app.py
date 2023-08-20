@@ -53,7 +53,7 @@ def predict(config):
     y_pred = model.predict(X_recent)
     return y_pred
 
-def handler(event, context)
+def handler(event, context):
     predict()
 if __name__ == "__main__":
     handler()
