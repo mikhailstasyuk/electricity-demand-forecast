@@ -1,2 +1,0 @@
-[2023-08-18 02:35:46,781][alembic.runtime.migration][INFO] - Context impl SQLiteImpl.
-[2023-08-18 02:35:46,781][alembic.runtime.migration][INFO] - Will assume non-transactional DDL.
