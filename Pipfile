@@ -4,16 +4,17 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-hydra-core = "*"
-xgboost = "*"
 pandas = "*"
 scikit-learn = "*"
-prefect = "*"
-mlflow = "*"
-optuna = "*"
+xgboost = "*"
+requests = "*"
+hydra-core = "*"
 psycopg2-binary = "*"
+mlflow = {extras = ["s3"], version = "*"}
+optuna = "*"
+boto3 = "*"
 
 [dev-packages]
 
 [requires]
-python_version = "3.9"
+python_version = "3.10"

@@ -3,7 +3,7 @@
 import pandas as pd
 
 from sklearn.preprocessing import OneHotEncoder
-from prefect import task, flow
+# from prefect import task, flow
 import hydra
 
 from db_store import DatabaseHandler
@@ -33,7 +33,7 @@ from db_store import DatabaseHandler
 #         df = pd.read_sql_query(query, conn).reset_index(drop=True)
 #     return df
 
-@task(retries=3, retry_delay_seconds=5)
+# @task(retries=3, retry_delay_seconds=5)
 def filter_by_iqr(df: pd.DataFrame) -> pd.DataFrame:
     """
     Filter DataFrame using the Interquartile Range (IQR) method.
@@ -59,7 +59,7 @@ def filter_by_iqr(df: pd.DataFrame) -> pd.DataFrame:
 
     return df_filtered
 
-@task(retries=3, retry_delay_seconds=5)
+# @task(retries=3, retry_delay_seconds=5)
 def extract_features(
         df: pd.DataFrame,
         window_size=7,
@@ -106,7 +106,7 @@ def extract_features(
 
     return df
 
-@task(retries=3, retry_delay_seconds=5)
+# @task(retries=3, retry_delay_seconds=5)
 def transform_to_supervised(df: pd.DataFrame) -> pd.DataFrame:
     """
     Transform DataFrame into a supervised learning format.
@@ -131,7 +131,7 @@ def transform_to_supervised(df: pd.DataFrame) -> pd.DataFrame:
     df = df.drop(columns=['period'])
     return df
 
-@task(retries=3, retry_delay_seconds=5)
+# @task(retries=3, retry_delay_seconds=5)
 def encode_categorical(df: pd.DataFrame, ohe=None, fit=True) -> pd.DataFrame:
     """
     Encode categorical columns as dummy variables.
@@ -161,23 +161,21 @@ def encode_categorical(df: pd.DataFrame, ohe=None, fit=True) -> pd.DataFrame:
     df = pd.concat((df.drop(columns=feat_to_enc.columns), dummies), axis=1)
     return df, ohe
 
+def prepare_for_inference(df: pd.DataFrame,
+        last_day_rolling_vals: pd.DataFrame,
+        ohe: OneHotEncoder, 
+        schema: list
+) -> pd.DataFrame:
+        df = extract_features(df, inference=True)
+        df = df.rename(columns={'value': 'lag'})
+        df, _ = encode_categorical(df, ohe=ohe, fit=False)
+        df[['rolling_mean', 'rolling_std']] = last_day_rolling_vals
+        X_recent = df[schema]
+        return X_recent
+
 # @hydra.main(config_path='conf/', config_name='config.yaml')
-@flow(name="data_preprocessing flow", retries=3, retry_delay_seconds=5)
-def preprocess(config):
-    db_handler = DatabaseHandler(config)
-
-    db_handler.connect()
-
-    input_schema = ['period', 'timezone', 'value']
-    tab_name = config.data.tab_params.tabname
-    schema_str = ",".join(input_schema)
-
-    query = f'SELECT {schema_str} FROM {tab_name};'
-    
-    df = db_handler.query(query)
-    
-    db_handler.close()
-
+# @flow(name="data_preprocessing flow", retries=3, retry_delay_seconds=5)
+def preprocess(df):
     # Clean it up, extract date features and running statistics.
     df_no_outliers = filter_by_iqr(df)
     df_newfeat= extract_features(df_no_outliers)

@@ -1,11 +1,8 @@
 #!/usr/bin/env python
 # coding: utf-8
 import os
-import hydra
-from hydra import utils
-
 import mlflow
-from prefect import task
+# from prefect import task
 import pandas as pd
 
 import matplotlib
@@ -16,13 +13,13 @@ from sklearn.preprocessing import OneHotEncoder
 from sklearn.model_selection import TimeSeriesSplit
 from sklearn.metrics import mean_absolute_error
 
-@task(name='train func', retries=3, retry_delay_seconds=3)
+# @task(name='train func', retries=3, retry_delay_seconds=3)
 def train(config,
     model: XGBRegressor, 
     X: pd.DataFrame, 
     y: pd.Series,
     n_splits: int,
-    track=False,
+    track=False
 ) -> tuple:
     """
     Train a model using TimeSeriesSplit cross-validation.
@@ -38,10 +35,16 @@ def train(config,
     """
 
     if track == True:
-        TRACKING_URI = 'sqlite:///' + utils.get_original_cwd() + '/mlflow.db'
+        TRACKING_URI = 'sqlite:///mlflow.db'
+        # TRACKING_URI = 'http://127.0.0.1:5000'
         mlflow.set_tracking_uri(TRACKING_URI)
-        mlflow.set_experiment(config.mlflow.experiment_name)
-
+        try:
+            mlflow.create_experiment(
+                name=config.mlflow.experiment_name, 
+                artifact_location=config.mlflow.s3bucket + '/mlruns'
+        )
+        except:
+            mlflow.set_experiment(config.mlflow.experiment_name)
     # Lists to store mean absolute errors for training and test sets
     mae_train_hist = []
     mae_test_hist = []
@@ -75,8 +78,7 @@ def train(config,
             mlflow.log_metric('mae_train', mae_train)
             mlflow.log_metric('mae_test', mae_test)
             mlflow.xgboost.log_model(model, 'xgb_best')
-            mlflow.log_artifacts(utils.to_absolute_path("conf"))
-            mlflow.log_artifacts(os.getcwd() + '/artifacts')
+            mlflow.log_artifacts('./artifacts')
 
     # Calculate average mean absolute error for training and test sets
     mae_train_avg = sum(mae_train_hist) / len(mae_train_hist)

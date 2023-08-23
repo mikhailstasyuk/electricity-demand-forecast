@@ -1,13 +1,15 @@
 #!/usr/bin/env python
 # coding: utf-8
 import os
-import hydra
+
+from hydra import initialize, compose
 import requests
 from datetime import datetime
 
 import psycopg2
 from psycopg2 import extras
 from psycopg2.errors import OperationalError
+
 
 class URLParser(object):
     def __init__(self, config):
@@ -47,7 +49,7 @@ class DatabaseHandler(object):
     def __init__(self, config):
         self.config = config
         self.conn = None
-        
+            
     def connect(self):
         # Connection logic
         conn_params = {
@@ -113,7 +115,6 @@ class DatabaseHandler(object):
             print(f"Failed to fetch data. Status code: {response.status_code}")
             return None
 
-
     def insert(self,
         data: list,
         schema: list,
@@ -145,12 +146,16 @@ class DatabaseHandler(object):
         else:
             print("Not connected to a db.")
 
-
-@hydra.main(config_path='conf', config_name='config.yaml')
-def main(config):
+def main():
     if os.path.isfile('.env'):
         from dotenv import load_dotenv
         load_dotenv()
+
+    initialize(version_base=None, config_path='conf/', job_name='demand-forecast')
+    config = compose(config_name='config.yaml')   
+    print(config) 
+    print(os.getenv('API_KEY'))
+
     # Connect to db
     db_store = DatabaseHandler(config)
     db_store.connect()

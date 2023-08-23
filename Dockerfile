@@ -1,24 +1,31 @@
-FROM public.ecr.aws/lambda/python:3.9
+FROM public.ecr.aws/lambda/python:3.10
 
 # Copy function code
-COPY src .
-COPY src/app.py ${LAMBDA_TASK_ROOT}
+COPY src ${LAMBDA_TASK_ROOT}
+COPY .env ${LAMBDA_TASK_ROOT}
 COPY Pipfile ${LAMBDA_TASK_ROOT}
-COPY Pipfile.lock ${LAMBDA_TASK_ROOT} 
+COPY Pipfile.lock ${LAMBDA_TASK_ROOT}
 
 ARG API_KEY
+# ARG PREFECT_API_KEY
+# ARG PREFECT_WORKSPACE
 ARG AWS_ACCESS_KEY_ID
 ARG AWS_SECRET_ACCESS_KEY
 ARG AWS_DEFAULT_REGION
 
 ENV API_KEY $API_KEY
+# ENV PREFECT_API_KEY $PREFECT_API_KEY
+# ENV PREFECT_WORKSPACE $PREFECT_WORKSPACE
 ENV AWS_ACCESS_KEY_ID $AWS_ACCESS_KEY_ID
 ENV AWS_SECRET_ACCESS_KEY $AWS_SECRET_ACCESS_KEY
 ENV AWS_DEFAULT_REGION $AWS_DEFAULT_REGION
 
 RUN pip install --upgrade pip
-RUN pip install pipenv
+RUN pip install pipenv 
 RUN pipenv install --system --deploy
 
+# RUN prefect cloud login -k ${PREFECT_API_KEY} -w ${PREFECT_WORKSPACE}
+WORKDIR ${LAMBDA_TASK_ROOT}
+RUN echo q
 # Set the CMD to your handler (could also be done as a parameter override outside of the Dockerfile)
-CMD [ "app.handler" ]
+CMD [ "app.lambda_handler" ]

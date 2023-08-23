@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
 import optuna
-import hydra
 from xgboost import XGBRegressor
 
 def tune_hyperparameters(config, train_func, X, y, n_trials=100, n_splits=5):

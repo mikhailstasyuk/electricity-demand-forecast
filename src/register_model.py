@@ -4,12 +4,11 @@
 import mlflow
 from mlflow import MlflowClient
 from mlflow.entities import ViewType
-import hydra
-from hydra import utils
 from pprint import pprint
 
 def search_best(config):
-    TRACKING_URI = 'sqlite:///' + utils.get_original_cwd() + '/mlflow.db'
+    # TRACKING_URI = 'sqlite:///mlflow.db'
+    TRACKING_URI = 'http://127.0.0.1:5000'
     mlflow.set_tracking_uri(TRACKING_URI)
     
     experiment = mlflow.get_experiment_by_name(config.mlflow.experiment_name)
@@ -51,7 +50,6 @@ def register_model(run, model_name):
         return result
     return None
 
-@hydra.main(config_path='conf/', config_name='config.yaml')
 def choose_and_register(config):
     run = search_best(config)
     model_name = config.mlflow.model_name + '-reg'

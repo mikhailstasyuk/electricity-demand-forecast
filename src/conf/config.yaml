@@ -1,6 +1,7 @@
 mlflow:
   experiment_name: electricity-demand
   model_name: xgb-regressor
+  s3bucket: s3://mysuperuniquebucket
 
 data:
   conn_params:
@@ -46,7 +47,7 @@ data:
 
 hyperparameters:
   SEED: 1
-  N_TRIALS: 1
+  N_TRIALS: 2
 
   sample_space:
     n_estimators:
@@ -76,7 +77,7 @@ hyperparameters:
     lambda_val: 
       - 1e-5
       - 10.0
-    EARLY_STOPPING_ROUNDS: 100
+    EARLY_STOPPING_ROUNDS: 10
 
 training:
   N_SPLITS: 9
