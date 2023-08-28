@@ -1,7 +1,7 @@
 mlflow:
   experiment_name: electricity-demand-new
   model_name: xgb-regressor
-  s3bucket: s3://mysuperuniquebucket
+  s3bucket: ${oc.env:S3_URI}
 
 data:
   conn_params:
