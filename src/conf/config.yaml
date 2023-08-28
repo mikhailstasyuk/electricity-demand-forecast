@@ -1,15 +1,15 @@
 mlflow:
-  experiment_name: electricity-demand
+  experiment_name: electricity-demand-new
   model_name: xgb-regressor
   s3bucket: s3://mysuperuniquebucket
 
 data:
   conn_params:
-    dbname: db_demand
-    user: dbuser
-    password: 123
-    host: localhost
-    port: 5432
+    dbname: ${oc.env:DB_NAME}
+    user: ${oc.env:DB_USER}
+    password: ${oc.env:DB_PASSWORD}
+    host: ${oc.env:DB_HOST}
+    port: ${oc.env:DB_PORT}
     connect_timeout: 5
 
   tab_params:
@@ -47,7 +47,7 @@ data:
 
 hyperparameters:
   SEED: 1
-  N_TRIALS: 2
+  N_TRIALS: 10
 
   sample_space:
     n_estimators:
