@@ -1,45 +1,20 @@
-#!/usr/bin/env python
+# !/usr/bin/env python
 # coding: utf-8
+import os
 import mlflow
 import mlflow.pyfunc
-from mlflow.tracking import MlflowClient
+from mlflow.exceptions import MlflowException
 from hydra import initialize, compose
 import pickle
 
-def get_prod_uri(model_name):
-    # Initialize the MLflow client
-    client = MlflowClient()
-
-    # Get a list of all registered models
-    registered_models = client.get_latest_versions(name=model_name, 
-                                                   stages=["Production"])
-
-    # Find the model with "Production" stage
-    production_model_uri = None
-    for reg_model in registered_models:
-        # Get the latest version of the model in "Production" stage
-        latest_prod_version = client.get_latest_versions(reg_model.name, stages=["Production"])
-        
-        if latest_prod_version:
-            # Construct the full URI of the model in the S3 bucket
-            production_model_uri = latest_prod_version[0].source
-            break
-
-    if production_model_uri:
-        print(f"The URI of the model in 'Production' stage is: {production_model_uri}")
-        return production_model_uri
-    else:
-        print("No model found in 'Production' stage.")
-
 # @flow(name='make_prediction')
-def predict(config, model_uri):
-    try:
-        model = mlflow.pyfunc.load_model(
-            model_uri=model_uri
-        )
-
-    except Exception as e:
-        raise Exception(str(e) + f'model URI:{model_uri}')
+def predict(config, model_name):
+    stage = "Production"
+    print("Stage:", stage)
+    model_uri = f"models:/{model_name}/{stage}"
+    print("Model URI:", model_uri)
+    model_uri = "s3://electricity-demand-bucket/mlruns/2e2bcde262ad4520b8da93ba22265361/artifacts/xgb_best"
+    model = mlflow.pyfunc.load_model(model_uri=model_uri)
 
     best_run_id = model.metadata.run_id
 
@@ -51,26 +26,30 @@ def predict(config, model_uri):
     last_day_vals = artifacts[2]
     y_pred = model.predict(last_day_vals)
     return y_pred[0]
-
-def lambda_handler(event, context):
     
+def lambda_handler(event, context):
     # Initialize Hydra
-    initialize(version_base=None, config_path="../conf/", job_name="lambda_job")
+    initialize(version_base=None, config_path="conf/", job_name="lambda_job")
     config = compose(config_name="config.yaml")
     
     dbname = config.data.conn_params.dbname
     user = config.data.conn_params.user
     password = config.data.conn_params.password
     host = config.data.conn_params.host
-    
-    TRACKING_URI = f'postgresql://{user}:{password}@{host}/{dbname}'
+    port = config.data.conn_params.port
+    print("Using:\n", dbname)
+    TRACKING_URI = f'postgresql://{user}:{password}@{host}:{port}/{dbname}'
+    print("Setting URI...", TRACKING_URI)
     mlflow.set_tracking_uri(TRACKING_URI)
-    mlflow.set_experiment(config.mlflow.experiment_name)
+    
+    # # mlflow.set_experiment(config.mlflow.experiment_name)
     model_name = config.mlflow.model_name + '-reg'
     
     try: # Call the prediction function
-        model_uri = get_prod_uri(model_name)
-        pred = predict(config=config, model_uri=model_uri)
+        print("Current directory before:", os.getcwd())
+        os.chdir("/tmp")
+        print("Current directory after:", os.getcwd())
+        pred = predict(config=config, model_name=model_name)
         # Return the result as JSON
         result = {'prediction': float(pred)}
         print(result)

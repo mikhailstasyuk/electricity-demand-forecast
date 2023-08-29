@@ -2,12 +2,11 @@ FROM public.ecr.aws/lambda/python:3.10
 # This is an inference only container
 WORKDIR ${LAMBDA_TASK_ROOT}
 
-COPY inference/app.py ${LAMBDA_TASK_ROOT}
-COPY conf/config.yaml ${LAMBDA_TASK_ROOT}
+COPY prediction/app.py ${LAMBDA_TASK_ROOT}
+COPY conf/ ${LAMBDA_TASK_ROOT}/conf
 
-COPY inference/.env ${LAMBDA_TASK_ROOT}
-COPY inference/Pipfile ${LAMBDA_TASK_ROOT}
-COPY inference/Pipfile.lock ${LAMBDA_TASK_ROOT}
+COPY prediction/Pipfile ${LAMBDA_TASK_ROOT}
+COPY prediction/Pipfile.lock ${LAMBDA_TASK_ROOT}
 
 ARG AWS_ACCESS_KEY_ID
 ARG AWS_SECRET_ACCESS_KEY
