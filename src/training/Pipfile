@@ -4,7 +4,6 @@ verify_ssl = true
 name = "pypi"
 
 [pipenv]
-dotenv_location = "../../.env"
 
 [packages]
 pandas = "2.0.3"
