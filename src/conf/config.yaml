@@ -1,5 +1,5 @@
 mlflow:
-  experiment_name: electricity-demand-1
+  experiment_name: electricity-demand-2
   model_name: xgb-regressor
   s3bucket: ${oc.env:S3_URI}
 
