@@ -1,5 +1,5 @@
 mlflow:
-  experiment_name: electricity-demand-new
+  experiment_name: electricity-demand-2
   model_name: xgb-regressor
   s3bucket: ${oc.env:S3_URI}
 
@@ -47,7 +47,7 @@ data:
 
 hyperparameters:
   SEED: 1
-  N_TRIALS: 10
+  N_TRIALS: 1
 
   sample_space:
     n_estimators:
