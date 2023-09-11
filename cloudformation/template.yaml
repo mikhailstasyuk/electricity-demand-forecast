@@ -5,11 +5,22 @@ Parameters:
     Description: Name of an existing EC2 key pair to enable SSH access
     Type: AWS::EC2::KeyPair::KeyName
     ConstraintDescription: Must be the name of an existing EC2 key pair.
-
   myBucketName:
     Description: Name of an S3 bucket
     Type: String
     ConstraintDescription: 'Must be unique globally.'
+  myInstanceType:
+    Description: Type of an EC2 instance
+    Type: String
+  myImageId:
+    Description: ID of a Amazon Machine Image to use
+    Type: String
+  dbMasterUsername:
+    Description: DB username
+    Type: String
+  dbMasterUserPassword:
+    Description: DB password
+    Type: String
 
 Resources:
   MyS3Bucket:
