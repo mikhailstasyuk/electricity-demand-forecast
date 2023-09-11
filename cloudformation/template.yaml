@@ -5,21 +5,30 @@ Parameters:
     Description: Name of an existing EC2 key pair to enable SSH access
     Type: AWS::EC2::KeyPair::KeyName
     ConstraintDescription: Must be the name of an existing EC2 key pair.
+
   myBucketName:
     Description: Name of an S3 bucket
     Type: String
     ConstraintDescription: 'Must be unique globally.'
+
   myInstanceType:
     Description: Type of an EC2 instance
     Type: String
+
   myImageId:
     Description: ID of a Amazon Machine Image to use
     Type: String
+
   dbMasterUsername:
     Description: DB username
     Type: String
+
   dbMasterUserPassword:
     Description: DB password
+    Type: String
+
+  myImageUri:
+    Description: ECR container image URI for the Lambda function
     Type: String
 
 Resources:
@@ -27,6 +36,26 @@ Resources:
     Type: 'AWS::S3::Bucket'
     Properties:
       BucketName: !Ref myBucketName
+
+  S3Endpoint:
+    Type: 'AWS::EC2::VPCEndpoint'
+    Properties:
+      VpcId: !Ref MyVPC
+      ServiceName: !Sub com.amazonaws.${AWS::Region}.s3
+      RouteTableIds:
+        - !Ref PublicRouteTable
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal: '*'
+            Action:
+              - 's3:GetObject'
+              - 's3:PutObject'
+              - 's3:ListBucket'
+            Resource: 
+              - !Sub 'arn:aws:s3:::${myBucketName}/*'
+              - !Sub 'arn:aws:s3:::${myBucketName}'
 
   MyVPC:
     Type: 'AWS::EC2::VPC'
@@ -85,6 +114,11 @@ Resources:
             Ref: 'MySubnetA'
           GroupSet:
             - Ref: 'EC2SecurityGroup'
+      BlockDeviceMappings:
+        - DeviceName: "/dev/sda1"   
+          Ebs:
+            VolumeSize: 15  
+            DeleteOnTermination: true  
 
   RDSDBSubnetGroup:
     Type: 'AWS::RDS::DBSubnetGroup'
@@ -145,6 +179,73 @@ Resources:
     Properties:
       GroupDescription: 'Security group with no ingress rule'
       VpcId: !Ref MyVPC
+
+  LambdaExecutionRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+              - lambda.amazonaws.com
+          Action:
+            - sts:AssumeRole
+      Policies:
+      - PolicyName: LambdaS3RDSAccessPolicy
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action:
+            - s3:GetObject
+            - s3:PutObject
+            - s3:ListBucket
+            Resource: 
+              - !Sub 'arn:aws:s3:::${myBucketName}/*'
+              - !Sub 'arn:aws:s3:::${myBucketName}'
+          - Effect: Allow
+            Action:
+            - rds:DescribeDBInstances
+            Resource: "*"
+          - Effect: Allow
+            Action:
+            - ec2:CreateNetworkInterface
+            - ec2:DescribeNetworkInterfaces
+            - ec2:DeleteNetworkInterface
+            - ec2:DescribeVpcs
+            - ec2:DescribeSubnets
+            Resource: "*"
+
+  RDSSecurityGroupIngressForLambda:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref RDSSecurityGroup
+      IpProtocol: tcp
+      FromPort: '5432'
+      ToPort: '5432'
+      SourceSecurityGroupId: !GetAtt [LambdaSecurityGroup, GroupId]
+
+  LambdaSecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: 'Security group for Lambda'
+      VpcId: !Ref MyVPC
+
+  MyLambdaFunction:
+    Type: 'AWS::Lambda::Function'
+    Properties:
+      PackageType: Image
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Code:
+        ImageUri: !Ref myImageUri  
+      VpcConfig:
+        SecurityGroupIds:
+          - !Ref LambdaSecurityGroup
+        SubnetIds:
+          - !Ref MySubnetA
+          - !Ref MySubnetB
 
 Outputs:
   EC2InstanceId:
