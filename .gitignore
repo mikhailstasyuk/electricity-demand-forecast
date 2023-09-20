@@ -3,3 +3,4 @@ testdata/
 __pycache__/
 .env
 parameters.json
+parameters-backup.json
