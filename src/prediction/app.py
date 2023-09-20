@@ -6,9 +6,7 @@ import mlflow.pyfunc
 from mlflow.exceptions import MlflowException
 from hydra import initialize, compose
 import pickle
-from prefect import task, flow
 
-@task
 def predict(model_name):
     stage = "Production"
     model_uri = f"models:/{model_name}/{stage}"
@@ -26,9 +24,8 @@ def predict(model_name):
     y_pred = model.predict(last_day_vals)
     return y_pred[0]
 
-@flow
 def make_prediction():    
-    config_path = '../conf/'
+    config_path = 'conf/'
     initialize(version_base=None, config_path=config_path, job_name="lambda_job")
     config = compose(config_name="config.yaml")
     
@@ -44,7 +41,7 @@ def make_prediction():
     model_name = config.mlflow.model_name + '-reg'
     
     try: 
-        # os.chdir("/tmp")
+        os.chdir("/tmp")
         pred = predict(model_name=model_name)
 
         # Return the result as JSON
@@ -59,4 +56,4 @@ def lambda_handler(event, context):
     make_prediction()
 
 if __name__ == "__main__":
-    lambda_handler(None, None)
+    lambda_handler()

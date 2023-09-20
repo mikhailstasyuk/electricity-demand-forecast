@@ -1,4 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
+Description: 'CloudFormation template for creating the necessary resorces'
 
 Parameters:
   KeyPairName:
@@ -119,6 +120,12 @@ Resources:
           Ebs:
             VolumeSize: 15  
             DeleteOnTermination: true  
+      InstanceInitiatedShutdownBehavior: stop
+      UserData:
+        Fn::Base64: 
+          !Sub |
+            #!/bin/bash
+            sudo shutdown -h now
 
   RDSDBSubnetGroup:
     Type: 'AWS::RDS::DBSubnetGroup'
