@@ -15,9 +15,12 @@ curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip
 unzip awscliv2.zip
 ./aws/install
 
+# Clean
+rm -r aws
+rm awscliv2.zip
+
 # Create conda venv
 conda create -n venv
 conda init && . ~/.bashrc && conda activate venv
-
-# Run train
-bash pipeline.sh
+pip install pipenv
+pipenv install
