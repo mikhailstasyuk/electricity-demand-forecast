@@ -22,3 +22,5 @@ rm awscliv2.zip
 # Create conda venv
 conda create -n venv
 conda init && . ~/.bashrc && conda activate venv
+pip install pipenv
+pipenv install
