@@ -4,6 +4,7 @@ import os
 import mlflow
 import mlflow.pyfunc
 from mlflow.exceptions import MlflowException
+from hydra.core.global_hydra import GlobalHydra
 from hydra import initialize, compose
 import pickle
 
@@ -26,9 +27,11 @@ def predict(model_name):
 
 def make_prediction():    
     config_path = 'conf/'
-    initialize(version_base=None, config_path=config_path, job_name="lambda_job")
-    config = compose(config_name="config.yaml")
-    
+
+    if GlobalHydra().is_initialized() == False:
+        initialize(version_base=None, config_path=config_path, job_name="lambda_job")
+        config = compose(config_name="config.yaml")
+
     dbname = config.data.conn_params.dbname
     user = config.data.conn_params.user
     password = config.data.conn_params.password
@@ -46,7 +49,6 @@ def make_prediction():
 
         # Return the result as JSON
         result = {'prediction': float(pred)}
-        print(result)
         return result
     
     except Exception as e:

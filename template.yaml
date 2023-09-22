@@ -255,10 +255,6 @@ Resources:
           - !Ref MySubnetB
 
 Outputs:
-  EC2InstanceId:
-    Description: "ID of the created EC2 instance"
-    Value: !Ref MyEC2Instance
-
   RDSInstanceEndpoint:
     Description: "Endpoint of the created RDS instance"
     Value: !GetAtt MyRDSInstance.Endpoint.Address
