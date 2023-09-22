@@ -3,15 +3,20 @@
 # Update repo
 git pull https://github.com/mikhailstasyuk/electricity-demand-forecast
 
+# Load env variables
+source .env
+
 # Add db endpoint to env variables list
-bash get_db_host.sh
+DB_HOST=$(aws cloudformation describe-stacks --stack-name $STACK_NAME --query 'Stacks[0].Outputs[?OutputKey==`RDSInstanceEndpoint`].OutputValue' --output text)
+export DB_HOST
 
 # Activate conda env
-conda activate venv
+conda init && source ~/.bashrc && conda activate venv
 
 # Update dependencies
-pipenv update
+#pipenv update
+pipenv run prefect cloud login --key $PREFECT_API_KEY --workspace $PREFECT_WORKSPACE
 
 # Run training pipeline
-python db_store.py
-python main_flow.py
+pipenv run python db_store.py
+pipenv run python main_flow.py
