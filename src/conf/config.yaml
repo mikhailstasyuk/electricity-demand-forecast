@@ -1,7 +1,7 @@
 mlflow:
   experiment_name: electricity-demand-forecast
   model_name: xgb-regressor
-  s3bucket: ${oc.env:S3_URI}
+  s3bucket: s3://${oc.env:S3_NAME}
 
 data:
   conn_params:
