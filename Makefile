@@ -1,7 +1,7 @@
 include .env
 export
 
-IMAGES = $(LAMBDA_IMAGE_NAME) #$(EC2_IMAGE_NAME)
+IMAGES = $(LAMBDA_IMAGE_NAME)
 
 AWS_SERVER = $(AWS_ACCOUNT_ID).dkr.ecr.$(AWS_DEFAULT_REGION).amazonaws.com
 
@@ -11,11 +11,12 @@ login:
 
 push: login
 	for img in $(IMAGES); do \
-		docker build --no-cache\
+		docker build \
     		--build-arg AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID) \
     		--build-arg AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY) \
     		--build-arg AWS_DEFAULT_REGION=$(AWS_DEFAULT_REGION) \
     		--build-arg API_KEY=$(API_KEY) \
+			--build-arg STACK_NAME=$(STACK_NAME) \
     		--build-arg DB_NAME=$(DB_NAME) \
     		--build-arg DB_USER=$(DB_USER) \
     		--build-arg DB_PASSWORD=$(DB_PASSWORD) \
@@ -45,5 +46,5 @@ delete-stack:
 clean:
 	rm parameters.json
 
-setup: make-stack-params create-stack clean
+setup: push make-stack-params create-stack clean
 	
