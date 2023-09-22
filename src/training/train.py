@@ -41,16 +41,17 @@ def train(config,
         host = config.data.conn_params.host
 
         TRACKING_URI = f'postgresql://{user}:{password}@{host}/{dbname}'
+        print("Setting tracking URI to:", TRACKING_URI)
         mlflow.set_tracking_uri(TRACKING_URI)
         
         try:
-            print("Creating experiment", config.mlflow.experiment_name)
+            print("Creating experiment...", config.mlflow.experiment_name)
             mlflow.create_experiment(
                 name=config.mlflow.experiment_name, 
                 artifact_location=config.mlflow.s3bucket + '/mlruns'
             )
-            mlflow.set_experiment(config.mlflow.experiment_name)
         except:
+            print("Creating failed, using existing experiment...", config.mlflow.experiment_name)
             mlflow.set_experiment(config.mlflow.experiment_name)
     # Lists to store mean absolute errors for training and test sets
     mae_train_hist = []
