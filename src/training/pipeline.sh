@@ -9,12 +9,10 @@ source .env
 # Add db endpoint to env variables list
 DB_HOST=$(aws cloudformation describe-stacks --stack-name $STACK_NAME --query 'Stacks[0].Outputs[?OutputKey==`RDSInstanceEndpoint`].OutputValue' --output text)
 export DB_HOST
-
-# Activate conda env
-conda init && source ~/.bashrc && conda activate venv
+echo $DB_HOST
 
 # Update dependencies
-#pipenv update
+pipenv update
 pipenv run prefect cloud login --key $PREFECT_API_KEY --workspace $PREFECT_WORKSPACE
 
 # Run training pipeline
