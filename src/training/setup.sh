@@ -6,6 +6,7 @@ wget https://repo.anaconda.com/miniconda/Miniconda3-py310_23.5.2-0-Linux-x86_64.
 bash ~/miniconda.sh -b -p $HOME/miniconda
 source ~/miniconda/bin/activate
 conda init bash
+. ~/.bashrc 
 
 # Install AWS CLI
 sudo apt-get update && sudo apt-get install -y unzip
@@ -18,8 +19,8 @@ sudo ./aws/install
 rm -r aws
 rm awscliv2.zip
 
-conda create -n venv && conda activate venv
-source ~/.bashrc 
+conda create -n venv python=3.10
+conda activate venv
 
 # Install dependencies
 pip install pipenv
