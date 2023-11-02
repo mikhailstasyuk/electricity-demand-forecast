@@ -48,14 +48,16 @@ def make_prediction():
         pred = predict(model_name=model_name)
 
         # Return the result as JSON
-        result = {'prediction': float(pred)}
+        result = {"prediction": str(float(pred))}
         return result
     
     except Exception as e:
         return {"Exception": str(e)}
 
+#
 def lambda_handler(event, context):
-    make_prediction()
+    result = make_prediction()
+    return result
 
 if __name__ == "__main__":
     lambda_handler()

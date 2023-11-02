@@ -39,6 +39,13 @@ create-stack:
     --parameters file://parameters.json \
     --capabilities CAPABILITY_IAM'
 
+update-stack:
+	@bash -c  'source .env && aws cloudformation update-stack \
+    --stack-name $(STACK_NAME) \
+    --template-body file://template.yaml \
+    --parameters file://parameters.json \
+    --capabilities CAPABILITY_IAM'
+
 delete-stack:
 	@bash -c  'source .env && aws cloudformation delete-stack \
     --stack-name $(STACK_NAME)'
@@ -47,4 +54,6 @@ clean:
 	rm parameters.json
 
 setup: push make-stack-params create-stack clean
+
+update: make-stack-params update-stack clean
 	

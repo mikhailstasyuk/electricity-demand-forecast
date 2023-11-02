@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: 'CloudFormation template for creating the necessary resorces'
+Description: 'CloudFormation template for creating the necessary resources'
 
 Parameters:
   KeyPairName:
@@ -17,7 +17,11 @@ Parameters:
     Type: String
 
   myImageId:
-    Description: ID of a Amazon Machine Image to use
+    Description: ID of an Amazon Machine Image to use
+    Type: String
+
+  dbMasterName:
+    Description: Name for an RDS database
     Type: String
 
   dbMasterUsername:
@@ -28,9 +32,14 @@ Parameters:
     Description: DB password
     Type: String
 
+  dbMasterPort:
+    Description: DB port
+    Type: Number  
+
   myImageUri:
     Description: ECR container image URI for the Lambda function
     Type: String
+
 
 Resources:
   MyS3Bucket:
@@ -122,10 +131,27 @@ Resources:
             DeleteOnTermination: true  
       InstanceInitiatedShutdownBehavior: stop
       UserData:
-        Fn::Base64: 
-          !Sub |
-            #!/bin/bash
-            sudo shutdown -h now
+          Fn::Base64: 
+            !Sub |
+              #!/bin/bash
+              #!/bin/bash
+
+              apt-get update && apt-get install -y unzip
+              apt-get install -y curl
+
+              curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+              unzip awscliv2.zip
+              ./aws/install
+
+              mkdir -p /home/ubuntu/miniconda3
+              wget https://repo.anaconda.com/miniconda/Miniconda3-py310_23.9.0-0-Linux-x86_64.sh -O /home/ubuntu/miniconda3/miniconda.sh
+              bash /home/ubuntu/miniconda3/miniconda.sh -b -u -p /home/ubuntu/miniconda3
+              rm -rf /home/ubuntu/miniconda3/miniconda.sh
+              /home/ubuntu/miniconda3/bin/conda init bash
+              /home/ubuntu/miniconda3/bin/pip install --upgrade pip
+              /home/ubuntu/miniconda3/bin/pip install pipenv
+
+              sudo shutdown -h now
 
   RDSDBSubnetGroup:
     Type: 'AWS::RDS::DBSubnetGroup'
@@ -253,7 +279,17 @@ Resources:
         SubnetIds:
           - !Ref MySubnetA
           - !Ref MySubnetB
-
+      MemorySize: 512
+      Timeout: 90
+      Environment:
+        Variables:
+          DB_NAME: !Ref dbMasterName
+          DB_USER: !Ref dbMasterUsername
+          DB_PASSWORD: !Ref dbMasterUserPassword
+          DB_PORT: !Ref dbMasterPort
+          DB_HOST: !GetAtt MyRDSInstance.Endpoint.Address
+          S3_URI: !Sub 's3://${myBucketName}'
+      
 Outputs:
   RDSInstanceEndpoint:
     Description: "Endpoint of the created RDS instance"

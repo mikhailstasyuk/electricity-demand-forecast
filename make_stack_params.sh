@@ -30,5 +30,21 @@ echo "[
     {
         \"ParameterKey\": \"myImageUri\",
         \"ParameterValue\": \"$LAMBDA_IMAGE_URI\"
-    }
+    },
+    {
+        \"ParameterKey\": \"dbMasterName\",
+        \"ParameterValue\": \"$DB_NAME\"
+    },         
+    {
+        \"ParameterKey\": \"dbMasterUsername\",
+        \"ParameterValue\": \"$DB_USER\"
+    },
+    {
+        \"ParameterKey\": \"dbMasterUserPassword\",
+        \"ParameterValue\": \"$DB_PASSWORD\"
+    },    
+    {
+        \"ParameterKey\": \"dbMasterPort\",
+        \"ParameterValue\": \"$DB_PORT\"
+    }     
 ]" > parameters.json

@@ -18,7 +18,7 @@ export DB_HOST
 source ~/miniconda/bin/activate
 conda init bash
 source ~/.bashrc 
-conda activate venv
+#conda activate venv
 
 pipenv install
 pipenv run prefect cloud login --key $PREFECT_API_KEY --workspace $PREFECT_WORKSPACE
