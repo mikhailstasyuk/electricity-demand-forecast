@@ -5,7 +5,9 @@ import mlflow
 from mlflow import MlflowClient
 from mlflow.entities import ViewType
 from pprint import pprint
+from prefect import flow, task
 
+@task(name="find best model", retries=5, retry_delay_seconds=5)
 def search_best(config):
     dbname = config.data.conn_params.dbname
     user = config.data.conn_params.user
@@ -54,6 +56,7 @@ def register_model(run, model_name):
         return result
     return None
 
+@flow(name="register model")
 def choose_and_register(config):
     run = search_best(config)
     model_name = config.mlflow.model_name + '-reg'
