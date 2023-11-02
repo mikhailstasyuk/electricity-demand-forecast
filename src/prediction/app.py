@@ -54,6 +54,7 @@ def make_prediction():
     except Exception as e:
         return {"Exception": str(e)}
 
+#
 def lambda_handler(event, context):
     result = make_prediction()
     return result
